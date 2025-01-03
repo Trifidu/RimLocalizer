@@ -1,0 +1,16 @@
+D:\Prog\Stud\C_Sharp\RimLocalizer\RimLocalizer\obj\Debug\RimLocalizer.csproj.AssemblyReference.cache
+D:\Prog\Stud\C_Sharp\RimLocalizer\RimLocalizer\obj\Debug\RimLocalizer.csproj.SuggestedBindingRedirects.cache
+D:\Prog\Stud\C_Sharp\RimLocalizer\RimLocalizer\obj\Debug\MainWindow.g.cs
+D:\Prog\Stud\C_Sharp\RimLocalizer\RimLocalizer\obj\Debug\App.g.cs
+D:\Prog\Stud\C_Sharp\RimLocalizer\RimLocalizer\obj\Debug\RimLocalizer_MarkupCompile.cache
+D:\Prog\Stud\C_Sharp\RimLocalizer\RimLocalizer\obj\Debug\RimLocalizer_MarkupCompile.lref
+D:\Prog\Stud\C_Sharp\RimLocalizer\RimLocalizer\bin\Debug\RimLocalizer.exe.config
+D:\Prog\Stud\C_Sharp\RimLocalizer\RimLocalizer\bin\Debug\RimLocalizer.exe
+D:\Prog\Stud\C_Sharp\RimLocalizer\RimLocalizer\bin\Debug\RimLocalizer.pdb
+D:\Prog\Stud\C_Sharp\RimLocalizer\RimLocalizer\obj\Debug\MainWindow.baml
+D:\Prog\Stud\C_Sharp\RimLocalizer\RimLocalizer\obj\Debug\RimLocalizer.g.resources
+D:\Prog\Stud\C_Sharp\RimLocalizer\RimLocalizer\obj\Debug\RimLocalizer.Properties.Resources.resources
+D:\Prog\Stud\C_Sharp\RimLocalizer\RimLocalizer\obj\Debug\RimLocalizer.csproj.GenerateResource.cache
+D:\Prog\Stud\C_Sharp\RimLocalizer\RimLocalizer\obj\Debug\RimLocalizer.csproj.CoreCompileInputs.cache
+D:\Prog\Stud\C_Sharp\RimLocalizer\RimLocalizer\obj\Debug\RimLocalizer.exe
+D:\Prog\Stud\C_Sharp\RimLocalizer\RimLocalizer\obj\Debug\RimLocalizer.pdb
