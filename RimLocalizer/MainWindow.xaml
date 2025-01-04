@@ -6,32 +6,130 @@
         xmlns:local="clr-namespace:RimLocalizer"
         mc:Ignorable="d"
         Title="RimLocalizer" Height="600" Width="800" MinWidth="800" MinHeight="600">
+    
     <Grid Margin="10">
+                
+        <!--Main structure-->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50" />
+            <!--Header-->
+            <RowDefinition Height="*" />
+            <!--Main content-->
+            <RowDefinition Height="30" />
+            <!--Footer-->
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <!--Sidebar-->
+            <ColumnDefinition Width="25*" />
+            <!--Main content-->
+            <ColumnDefinition Width="75*" />
+        </Grid.ColumnDefinitions>
+
         <!--Title-->
-        <TextBlock Text="RimLocalizer" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Margin="0,10,0,0"/>
+        <Border Grid.Row="0" Grid.ColumnSpan="2" Padding="10" Background="#EEE"  >
+            <TextBlock 
+                Grid.ColumnSpan="2"
+                Text="RimLocalizer" 
+                HorizontalAlignment="Center" 
+                VerticalAlignment="Top" 
+                FontSize="20" 
+                FontWeight="Bold"
+                />
+        </Border>
         
-        <!--Game and Mods pathes-->
-        <TextBlock Text="Путь к папке с игрой:" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,50,0,0"/>
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,75,0,0">
-            <TextBox Name="GamePathTextBox" Width="650" Height="25" />
-            <Button Content="..." Width="30" Height="25" Margin="5,0,0,0" Click="SelectGamePathButton_Click" />
-        </StackPanel>
+        <!--Sidebar-->
+        <Border Grid.Row="1" Grid.Column="0" Background="#F5F5F5" Padding="10">
+            <StackPanel>
+                <TextBlock Text="Моды" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
 
-        <TextBlock Text="Путь к папке с модами Steam:" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,120,0,0" />
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,145,0,0">
-            <TextBox Name="ModsPathTextBox" Width="650" Height="25" />
-            <Button Content="..." Width="30" Height="25" Margin="5,0,0,0" Click="SelectModsPathButton_Click" />
-        </StackPanel>
-
-        <!--Original and translated files--> 
-        <TextBlock Text="Оригинальный файл:" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,190,0,0"/>
-        <TextBox Name="OriginalTextBox" HorizontalAlignment="Left" Height="150" VerticalAlignment="Top" Width="350" Margin="10,210,0,0" TextWrapping="Wrap" AcceptsReturn="True"/>
-
-        <TextBlock Text="Переведённый файл:" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,190,10,0"/>
-        <TextBox Name="TranslatedTextBox" HorizontalAlignment="Right" Height="150" VerticalAlignment="Top" Width="350" Margin="0,210,10,0" TextWrapping="Wrap" AcceptsReturn="True"/>
+                <!-- Список модов -->
+                <ListBox Name="ModsListBox" Height="400" />
+            </StackPanel>
+        </Border>
         
-        <!--Buttons for work with Files-->
-        <Button Name="LoadButton" Content="Загрузить" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,10" Width="100" Click="LoadButton_Click"/>
-        <Button Name="SaveButton" Content="Сохранить" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10" Width="100" Click="SaveButton_Click"/>
+        <!--Main content-->
+        <Grid Grid.Column="1" Grid.Row="1" Margin="10">
+            <!--Main content structure-->
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50*" />
+                <ColumnDefinition Width="50*" />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25*" />
+                <RowDefinition Height="75*" />
+            </Grid.RowDefinitions>
+            
+            <!--Game and Mods pathes-->
+            <StackPanel Grid.ColumnSpan="2" Grid.Row="0" Margin="5">
+                <Grid VerticalAlignment="Stretch" >
+                    <!--Pathes structure-->
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="10*" />
+                        <RowDefinition Height="40*" />
+                        <RowDefinition Height="10*" />
+                        <RowDefinition Height="40*" />
+                    </Grid.RowDefinitions>
+                    <!--Pathes content-->
+                    <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="Путь к папке с игрой:" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="5,0,0,0" />
+                    <Grid Grid.Row="1" Grid.ColumnSpan="2" Margin="5,0,0,0" >
+                        <!--Game path structure-->
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="95*" />
+                            <ColumnDefinition Width="5*" />
+                        </Grid.ColumnDefinitions>
+                        <!--Game path content-->
+                        <TextBox Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Name="GamePathTextBox" Height="25"  />
+                        <Button Grid.Column="1" Content="..."  Height="25" Click="SelectGamePathButton_Click" />
+                    </Grid>
+                    <TextBlock Grid.Row="2" Text="Путь к папке с модами Steam:" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="5,0,0,0" />
+                    <Grid Grid.Row="3" Grid.ColumnSpan="2" Margin="5,0,0,0">
+                        <!--Mods path structure-->
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="95*" />
+                            <ColumnDefinition Width="5*" />
+                        </Grid.ColumnDefinitions>
+                        <!--Mods path content-->
+                        <TextBox Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Name="ModsPathTextBox" Height="25" />
+                        <Button Grid.Column="1" Content="..." Height="25" Click="SelectModsPathButton_Click" />
+                    </Grid>
+                </Grid>
+            </StackPanel>
+
+            <!--Original and translated files-->
+            <Grid Grid.Column="0" Grid.Row="1">
+                <Grid VerticalAlignment="Stretch">
+                    <!--Original file scructure-->
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="10*" />
+                        <RowDefinition Height="80*" />
+                        <RowDefinition Height="10*" />
+                    </Grid.RowDefinitions>
+                    <!--Original file content-->
+                    <TextBlock Grid.Row="0" Text="Оригинальный файл:" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,10,0,0"/>
+                    <TextBox Grid.Row="1" Name="OriginalTextBox" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,0,0,0" TextWrapping="Wrap" AcceptsReturn="True"/>
+                    <Button Grid.Row="2" Name="LoadButton" Content="Загрузить" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,10" Width="100" Click="LoadButton_Click"/>
+                </Grid>
+            </Grid>
+            <Grid Grid.Column="1" Grid.Row="1">
+                <Grid VerticalAlignment="Stretch">
+                    <!--Translated file scructure-->
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="10*" />
+                        <RowDefinition Height="80*" />
+                        <RowDefinition Height="10*" />
+                    </Grid.RowDefinitions>
+                    <!--Translated file content-->
+                    <TextBlock Grid.Row="0" Text="Переведённый файл:" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,10,10,0"/>
+                    <TextBox Grid.Row="1" Name="TranslatedTextBox" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,0,10,0" TextWrapping="Wrap" AcceptsReturn="True"/>
+                    <Button Grid.Row="2" Name="SaveButton" Content="Сохранить" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10" Width="100" Click="SaveButton_Click"/>
+                </Grid>
+            </Grid>
+        </Grid>
+        
+        <!--Footer-->
+        <Border Grid.Row="2" Grid.ColumnSpan="2" Background="#EEE" Padding="5">
+            <TextBlock Text="Статус: Готово" HorizontalAlignment="Right" VerticalAlignment="Center" />
+        </Border>
     </Grid>
 </Window>
