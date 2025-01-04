@@ -42,7 +42,8 @@
             <Grid VerticalAlignment="Stretch">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="10*" />
-                    <RowDefinition Height="60*" />
+                    <RowDefinition Height="10*" />
+                    <RowDefinition Height="50*" />
                     <RowDefinition Height="30*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
@@ -51,24 +52,65 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Моды" FontSize="16" FontWeight="Bold" Margin="0,0,0,10" VerticalAlignment="Center"/>
                 <Button Grid.Row="0" Grid.Column="1" Content="Загрузить моды" Command="{Binding LoadModsCommand}" VerticalAlignment="Center" />
+
+                <!--Search box-->
+                <Grid Grid.Row="1" Grid.ColumnSpan="2" Margin="0,10,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="70*" />
+                        <ColumnDefinition Width="30*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox 
+                        Grid.Column="0"
+                        Width="auto" 
+                        Height="auto" 
+                        MaxHeight="25"
+                        Name="SearchTextBox" 
+                        Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}">
+                        <TextBox.Style>
+                            <Style TargetType="TextBox">
+                                <Setter Property="Foreground" Value="Gray" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Text, RelativeSource={RelativeSource Self}}" Value="">
+                                        <Setter Property="Text" Value="Поиск модов..." />
+                                        <Setter Property="Foreground" Value="LightGray" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Text, RelativeSource={RelativeSource Self}}" Value="{x:Null}">
+                                        <Setter Property="Foreground" Value="Black" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                    <Button 
+                        Grid.Column="1"
+                        Content="Очистить" 
+                        Width="auto" 
+                        Height="auto" 
+                        MaxHeight="25"
+                        Command="{Binding ClearSearchCommand}" />
+                </Grid>
                 <!--Modlist-->
                 <ListBox 
-                    Grid.Row="1" 
+                    Grid.Row="2" 
                     Grid.ColumnSpan="2" 
                     Name="ModsListBox" 
                     VerticalAlignment="Stretch" 
                     HorizontalAlignment="Stretch" 
-                    ItemsSource="{Binding Mods}" 
+                    ItemsSource="{Binding FilteredMods}" 
                     SelectedItem="{Binding SelectedMod, Mode=TwoWay}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Name}" />
+                            <TextBlock>
+                                <Run Text="{Binding Source}" />
+                                <Run Text=" " />
+                                <Run Text="{Binding Name}" />
+                            </TextBlock>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
 
                 <!--Mod description-->
-                <Grid Grid.Row="2" Grid.ColumnSpan="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                <Grid Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="50*" />
                         <ColumnDefinition Width="50*" />

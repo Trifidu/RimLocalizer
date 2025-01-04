@@ -13,5 +13,7 @@ namespace RimLocalizer.ViewModels
         public string Description { get; set; }
         public string Author { get; set; }
         public string PreviewPath { get; set; }
+        public string Source { get; set; }
+
     }
 }

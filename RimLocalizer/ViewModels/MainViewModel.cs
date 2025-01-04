@@ -69,16 +69,32 @@ namespace RimLocalizer.ViewModels
         public MainViewModel()
         {
             // Initialising the mod collection
-            Mods = new ObservableCollection<ModItem>();
-            LoadModsCommand = new RelayCommand(LoadMods);
             GamePath = Properties.Settings.Default.GamePath;
             ModsPath = Properties.Settings.Default.ModsPath;
+            LoadModsCommand = new RelayCommand(LoadMods);
+            Mods = new ObservableCollection<ModItem>();
+            FilteredMods = new ObservableCollection<ModItem>();
+
+            // Checking saved paths and autoloading mods
+            if (!string.IsNullOrEmpty(GamePath) || !string.IsNullOrEmpty(ModsPath))
+            {
+                LoadMods();
+            }
+
+            // Initializing clear command
+            ClearSearchCommand = new RelayCommand(() =>
+            {
+                SearchQuery = string.Empty;
+            });
         }
 
         // Method for finding mods
         public void LoadMods()
         {
             Mods.Clear();
+
+            var loadedMods = new List<ModItem>();
+
 
             // Search for local mods
             if (!string.IsNullOrEmpty(GamePath))
@@ -89,13 +105,14 @@ namespace RimLocalizer.ViewModels
                     foreach (var dir in Directory.GetDirectories(localModsPath))
                     {
                         var modInfo = GetModInfo(dir); // Extracting information
-                        Mods.Add(new ModItem
+                        loadedMods.Add(new ModItem
                         {
                             Name = modInfo.Name,
                             Description = modInfo.Description,
                             Author = modInfo.Author,
                             Path = dir,
-                            PreviewPath = modInfo.PreviewPath
+                            PreviewPath = modInfo.PreviewPath,
+                            Source = "[L]"
                         });
                     }
                 }
@@ -109,17 +126,26 @@ namespace RimLocalizer.ViewModels
                     foreach (var dir in Directory.GetDirectories(ModsPath))
                     {
                         var modInfo = GetModInfo(dir); // Extracting information
-                        Mods.Add(new ModItem
+                        loadedMods.Add(new ModItem
                         {
                             Name = modInfo.Name,
                             Description = modInfo.Description,
                             Author = modInfo.Author,
                             Path = dir,
-                            PreviewPath = modInfo.PreviewPath
+                            PreviewPath = modInfo.PreviewPath,
+                            Source = "[S]"
                         });
                     }
                 }
             }
+
+            // Sort by mods name
+            foreach (var mod in loadedMods.OrderBy(m => m.Name))
+            {
+                Mods.Add(mod);
+            }
+
+            ApplySearchFilter();
         }
 
         // Method to notify the interface of a property change
@@ -166,6 +192,53 @@ namespace RimLocalizer.ViewModels
                 PreviewPath = File.Exists(previewPath) ? previewPath : null
             };
         }
+
+        // Adding a property for a search
+        private string _searchQuery;
+        public string SearchQuery
+        {
+            get => _searchQuery;
+            set
+            {
+                if (_searchQuery != value)
+                {
+                    _searchQuery = value;
+                    OnPropertyChanged(nameof(SearchQuery));
+                    ApplySearchFilter();
+                }
+            }
+        }
+
+        // Collection for storing filtered mods
+        private ObservableCollection<ModItem> _filteredMods;
+        public ObservableCollection<ModItem> FilteredMods
+        {
+            get => _filteredMods;
+            set
+            {
+                _filteredMods = value;
+                OnPropertyChanged(nameof(FilteredMods));
+            }
+        }
+
+        // Method for applying the search filter
+        private void ApplySearchFilter()
+        {
+            if (string.IsNullOrWhiteSpace(SearchQuery))
+            {
+                FilteredMods = new ObservableCollection<ModItem>(Mods);
+            }
+            else
+            {
+                FilteredMods = new ObservableCollection<ModItem>(
+                    Mods.Where(mod => mod.Name.IndexOf(SearchQuery, StringComparison.OrdinalIgnoreCase) >= 0));
+            }
+        }
+
+        // Command to clear the search field
+        public ICommand ClearSearchCommand { get; }
+
+
     }
 }
 
