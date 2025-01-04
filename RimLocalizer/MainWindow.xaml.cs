@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.IO;
 using Microsoft.Win32;
+using RimLocalizer.ViewModels;
+using RimLocalizer.Properties;
 
 namespace RimLocalizer
 {
@@ -24,6 +26,9 @@ namespace RimLocalizer
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = new MainViewModel(); // Connecting ViewModel
+            GamePathTextBox.Text = Properties.Settings.Default.GamePath;
+            ModsPathTextBox.Text = Properties.Settings.Default.ModsPath;
         }
 
         // Open file XML and copy to original Dialog Window
@@ -74,35 +79,62 @@ namespace RimLocalizer
         // Chosing game path
         private void SelectGamePathButton_Click(object sender, RoutedEventArgs e)
         {
-            var openFileDialog = new OpenFileDialog
+            using (var folderDialog = new System.Windows.Forms.FolderBrowserDialog())
             {
-                Title = "Выберите файл из корневой папки с игрой", 
-                Filter = "Все файлы (*.*)|*.*"
-            };
-
-            if (openFileDialog.ShowDialog() == true)
-            {
-                string folderPath = Path.GetDirectoryName(openFileDialog.FileName);
-                GamePathTextBox.Text = folderPath;
+                folderDialog.Description = "Выберите папку с игрой RimWorld";
+                if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    if (DataContext is MainViewModel viewModel)
+                    {
+                        viewModel.GamePath = folderDialog.SelectedPath;
+                        Properties.Settings.Default.GamePath = folderDialog.SelectedPath;
+                        Properties.Settings.Default.Save();
+                    }
+                }
             }
-        
+
+            //
+            // var openFileDialog = new OpenFileDialog
+            // {
+            //    Title = "Выберите файл из корневой папки с игрой", 
+            //    Filter = "Все файлы (*.*)|*.*"
+            // };
+
+            // if (openFileDialog.ShowDialog() == true)
+            // {
+            //    string folderPath = Path.GetDirectoryName(openFileDialog.FileName);
+            //    GamePathTextBox.Text = folderPath;
+            // }
         }
 
         // Chosing mods path
         private void SelectModsPathButton_Click(object sender, RoutedEventArgs e)
         {
-            var openFileDialog = new OpenFileDialog
+            using (var folderDialog = new System.Windows.Forms.FolderBrowserDialog())
             {
-                Title = "Выберите файл из папки с модами RimWorld",
-                Filter = "Все файлы (*.*)|*.*"
-            };
-
-            if (openFileDialog.ShowDialog() == true)
-            {
-                // Получаем путь к папке, в которой находится файл
-                string folderPath = Path.GetDirectoryName(openFileDialog.FileName);
-                ModsPathTextBox.Text = folderPath;
+                folderDialog.Description = "Выберите папку с модами";
+                if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    if (DataContext is MainViewModel viewModel)
+                    {
+                        viewModel.ModsPath = folderDialog.SelectedPath;
+                        Properties.Settings.Default.ModsPath = folderDialog.SelectedPath;
+                        Properties.Settings.Default.Save(); // Сохраняем настройки
+                    }
+                }
             }
+            // var openFileDialog = new OpenFileDialog
+            // {
+            //     Title = "Выберите файл из папки с модами RimWorld",
+            //     Filter = "Все файлы (*.*)|*.*"
+            // };
+            // 
+            // if (openFileDialog.ShowDialog() == true)
+            // {
+            //     // Получаем путь к папке, в которой находится файл
+            //     string folderPath = Path.GetDirectoryName(openFileDialog.FileName);
+            //     ModsPathTextBox.Text = folderPath;
+            // }
         }
     }
 }

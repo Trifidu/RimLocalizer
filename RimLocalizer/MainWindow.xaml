@@ -39,12 +39,20 @@
         
         <!--Sidebar-->
         <Border Grid.Row="1" Grid.Column="0" Background="#F5F5F5" Padding="10">
-            <StackPanel>
-                <TextBlock Text="Моды" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
-
-                <!-- Список модов -->
-                <ListBox Name="ModsListBox" Height="400" />
-            </StackPanel>
+            <Grid VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="10*" />
+                    <RowDefinition Height="90*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50*" />
+                    <ColumnDefinition Width="50*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Моды" FontSize="16" FontWeight="Bold" Margin="0,0,0,10" VerticalAlignment="Center"/>
+                <Button Grid.Row="0" Grid.Column="1" Content="Загрузить моды" Command="{Binding LoadModsCommand}" VerticalAlignment="Center" />
+                <!--Modlist-->
+                <ListBox Grid.Row="1" Grid.ColumnSpan="2" Name="ModsListBox" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ItemsSource="{Binding Mods}" />
+            </Grid>
         </Border>
         
         <!--Main content-->
@@ -79,7 +87,7 @@
                             <ColumnDefinition Width="5*" />
                         </Grid.ColumnDefinitions>
                         <!--Game path content-->
-                        <TextBox Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Name="GamePathTextBox" Height="25"  />
+                        <TextBox Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Name="GamePathTextBox" Height="25" Text="{Binding GamePath, UpdateSourceTrigger=PropertyChanged}" />
                         <Button Grid.Column="1" Content="..."  Height="25" Click="SelectGamePathButton_Click" />
                     </Grid>
                     <TextBlock Grid.Row="2" Text="Путь к папке с модами Steam:" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="5,0,0,0" />
@@ -90,7 +98,7 @@
                             <ColumnDefinition Width="5*" />
                         </Grid.ColumnDefinitions>
                         <!--Mods path content-->
-                        <TextBox Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Name="ModsPathTextBox" Height="25" />
+                        <TextBox Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Name="ModsPathTextBox" Height="25" Text="{Binding ModsPath, UpdateSourceTrigger=PropertyChanged}" />
                         <Button Grid.Column="1" Content="..." Height="25" Click="SelectModsPathButton_Click" />
                     </Grid>
                 </Grid>
