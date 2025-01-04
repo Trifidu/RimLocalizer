@@ -42,7 +42,8 @@
             <Grid VerticalAlignment="Stretch">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="10*" />
-                    <RowDefinition Height="90*" />
+                    <RowDefinition Height="60*" />
+                    <RowDefinition Height="30*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="50*" />
@@ -51,13 +52,75 @@
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Моды" FontSize="16" FontWeight="Bold" Margin="0,0,0,10" VerticalAlignment="Center"/>
                 <Button Grid.Row="0" Grid.Column="1" Content="Загрузить моды" Command="{Binding LoadModsCommand}" VerticalAlignment="Center" />
                 <!--Modlist-->
-                <ListBox Grid.Row="1" Grid.ColumnSpan="2" Name="ModsListBox" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ItemsSource="{Binding Mods}" SelectedItem="{Binding SelectedMod}">
+                <ListBox 
+                    Grid.Row="1" 
+                    Grid.ColumnSpan="2" 
+                    Name="ModsListBox" 
+                    VerticalAlignment="Stretch" 
+                    HorizontalAlignment="Stretch" 
+                    ItemsSource="{Binding Mods}" 
+                    SelectedItem="{Binding SelectedMod, Mode=TwoWay}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Name}" />
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
+
+                <!--Mod description-->
+                <Grid Grid.Row="2" Grid.ColumnSpan="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="50*" />
+                        <ColumnDefinition Width="50*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40*" />
+                        <RowDefinition Height="10*" />
+                        <RowDefinition Height="10*" />
+                        <RowDefinition Height="40*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Preview Image -->
+                    <Border Grid.Row="0" Grid.ColumnSpan="2">
+                        <Image Source="{Binding SelectedMod.PreviewPath}" Height="150" Width="150" Stretch="Uniform" />
+                    </Border>
+
+                    <!-- Name -->
+                    <Border Grid.Row="1" Grid.Column="0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Name: " FontWeight="Bold" />
+                            <TextBlock Text="{Binding SelectedMod.Name}" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Author -->
+                    <Border Grid.Row="1" Grid.Column="1">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Author: " FontWeight="Bold" />
+                            <TextBlock Text="{Binding SelectedMod.Author}" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Path -->
+                    <Border Grid.Row="2" Grid.ColumnSpan="2">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Path: " FontWeight="Bold" />
+                            <TextBlock Text="{Binding SelectedMod.Path}" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Description -->
+                    <Grid Grid.Row="3" Grid.ColumnSpan="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Description: " FontWeight="Bold" />
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                             <TextBlock Text="{Binding SelectedMod.Description}" TextWrapping="Wrap" />
+                        </ScrollViewer>                            
+                    </Grid>
+                </Grid>
             </Grid>
         </Border>
         

@@ -17,6 +17,18 @@ namespace RimLocalizer.ViewModels
         // Event for notification of changes to properties 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        private ModItem _selectedMod; // Поле для хранения выбранного мода
+
+        public ModItem SelectedMod
+        {
+            get => _selectedMod;
+            set
+            {
+                _selectedMod = value; // Устанавливаем выбранный мод
+                OnPropertyChanged(nameof(SelectedMod)); // Уведомляем интерфейс об изменении
+            }
+        }
+
         // Mods Collection
         private ObservableCollection<ModItem> _mods;
         public ObservableCollection<ModItem> Mods
@@ -68,7 +80,7 @@ namespace RimLocalizer.ViewModels
         {
             Mods.Clear();
 
-            // Search for local mods (game folder)
+            // Search for local mods
             if (!string.IsNullOrEmpty(GamePath))
             {
                 string localModsPath = Path.Combine(GamePath, "Mods");
@@ -76,13 +88,13 @@ namespace RimLocalizer.ViewModels
                 {
                     foreach (var dir in Directory.GetDirectories(localModsPath))
                     {
-                        var modInfo = GetModInfo(dir); // Getting mods information
+                        var modInfo = GetModInfo(dir); // Extracting information
                         Mods.Add(new ModItem
                         {
-                            Name = $"{modInfo.Name} [L]",
-                            Path = dir,
+                            Name = modInfo.Name,
                             Description = modInfo.Description,
                             Author = modInfo.Author,
+                            Path = dir,
                             PreviewPath = modInfo.PreviewPath
                         });
                     }
@@ -92,17 +104,17 @@ namespace RimLocalizer.ViewModels
             // Search for mods from Steam Workshop
             if (!string.IsNullOrEmpty(ModsPath))
             {
-                if (Directory.Exists(ModsPath)) 
+                if (Directory.Exists(ModsPath))
                 {
                     foreach (var dir in Directory.GetDirectories(ModsPath))
                     {
-                        var modInfo = GetModInfo(dir); // Получаем информацию о моде
+                        var modInfo = GetModInfo(dir); // Extracting information
                         Mods.Add(new ModItem
                         {
-                            Name = $"{modInfo.Name} [S]",
-                            Path = dir,
+                            Name = modInfo.Name,
                             Description = modInfo.Description,
                             Author = modInfo.Author,
+                            Path = dir,
                             PreviewPath = modInfo.PreviewPath
                         });
                     }
