@@ -8,7 +8,8 @@ using System.ComponentModel;
 using System.IO;
 using System.Windows.Input;
 using RimLocalizer;
-
+using System.Xml.Linq;
+using System.Net;
 namespace RimLocalizer.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
@@ -17,8 +18,8 @@ namespace RimLocalizer.ViewModels
         public event PropertyChangedEventHandler PropertyChanged;
 
         // Mods Collection
-        private ObservableCollection<string> _mods;
-        public ObservableCollection<string> Mods
+        private ObservableCollection<ModItem> _mods;
+        public ObservableCollection<ModItem> Mods
         {
             get { return _mods; }
             set
@@ -56,7 +57,7 @@ namespace RimLocalizer.ViewModels
         public MainViewModel()
         {
             // Initialising the mod collection
-            Mods = new ObservableCollection<string>();
+            Mods = new ObservableCollection<ModItem>();
             LoadModsCommand = new RelayCommand(LoadMods);
             GamePath = Properties.Settings.Default.GamePath;
             ModsPath = Properties.Settings.Default.ModsPath;
@@ -75,8 +76,15 @@ namespace RimLocalizer.ViewModels
                 {
                     foreach (var dir in Directory.GetDirectories(localModsPath))
                     {
-                        string modName = Path.GetFileName(dir);
-                        Mods.Add($"{modName} [L]");
+                        var modInfo = GetModInfo(dir); // Getting mods information
+                        Mods.Add(new ModItem
+                        {
+                            Name = $"{modInfo.Name} [L]",
+                            Path = dir,
+                            Description = modInfo.Description,
+                            Author = modInfo.Author,
+                            PreviewPath = modInfo.PreviewPath
+                        });
                     }
                 }
             }
@@ -88,8 +96,15 @@ namespace RimLocalizer.ViewModels
                 {
                     foreach (var dir in Directory.GetDirectories(ModsPath))
                     {
-                        string modName = Path.GetFileName(dir);
-                        Mods.Add($"{modName} [S]");
+                        var modInfo = GetModInfo(dir); // Получаем информацию о моде
+                        Mods.Add(new ModItem
+                        {
+                            Name = $"{modInfo.Name} [S]",
+                            Path = dir,
+                            Description = modInfo.Description,
+                            Author = modInfo.Author,
+                            PreviewPath = modInfo.PreviewPath
+                        });
                     }
                 }
             }
@@ -99,6 +114,45 @@ namespace RimLocalizer.ViewModels
         protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public class ModInfo
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public string Author { get; set; }
+            public string PreviewPath { get; set; }
+        }
+
+        //Method to add desc from mods
+        private ModInfo GetModInfo(string modPath)
+        {
+            string aboutPath = Path.Combine(modPath, "About", "About.xml");
+            string previewPath = Path.Combine(modPath, "About", "Preview.png");
+
+            if (!File.Exists(aboutPath))
+            {
+                return new ModInfo
+                {
+                    Name = "Неизвестный мод, проблема чтения About.xml",
+                    Description = "Описание отсутствует",
+                    Author = null,
+                    PreviewPath = null,
+                };
+            }
+            var xml = XDocument.Load(aboutPath);
+
+            string name = xml.Root.Element("name")?.Value ?? "Неизвестный мод";
+            string description = xml.Root.Element("description")?.Value ?? "Описание отсутствует";
+            string author = xml.Root.Element("author")?.Value ?? "Автор отсутствует";
+
+            return new ModInfo
+            {
+                Name = name,
+                Description = description,
+                Author = author,
+                PreviewPath = File.Exists(previewPath) ? previewPath : null
+            };
         }
     }
 }
