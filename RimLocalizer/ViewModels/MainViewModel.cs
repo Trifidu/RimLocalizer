@@ -84,6 +84,7 @@ namespace RimLocalizer.ViewModels
             _searchQuery = string.Empty;
             _filteredMods = new ObservableCollection<ModItem>();
             _originalFileContent = string.Empty;
+            _translatedFileContent = string.Empty;
             _selectedTranslationFile = string.Empty;
             _originalFilePath = string.Empty;
 
@@ -291,6 +292,17 @@ namespace RimLocalizer.ViewModels
             return translationFiles;
         }
 
+        private string _translatedFileContent;
+        public string TranslatedFileContent
+        {
+            get => _translatedFileContent;
+            set
+            {
+                _translatedFileContent = value;
+                OnPropertyChanged(nameof(TranslatedFileContent));
+            }
+        }
+
         private string GetRelativePath(string basePath, string fullPath)
         {
             Uri baseUri = new Uri(basePath.EndsWith("\\") ? basePath : basePath + "\\");
@@ -353,25 +365,31 @@ namespace RimLocalizer.ViewModels
             get => _selectedTranslationFile;
             set
             {
-                _selectedTranslationFile = value;
-                OnPropertyChanged(nameof(SelectedTranslationFile));
-
-                // Считываем содержимое файла
-                if (!string.IsNullOrEmpty(_selectedTranslationFile))
+                if (_selectedTranslationFile != value)
                 {
-                    string fullPath = Path.Combine(ModsPath, SelectedMod.Path, _selectedTranslationFile);
-                    if (File.Exists(fullPath))
+                    _selectedTranslationFile = value;
+                    OnPropertyChanged(nameof(SelectedTranslationFile));
+
+                    // Считываем содержимое оригинального файла
+                    if (!string.IsNullOrEmpty(_selectedTranslationFile))
                     {
-                        OriginalFileContent = File.ReadAllText(fullPath);
+                        string fullPath = Path.Combine(ModsPath, SelectedMod.Path, _selectedTranslationFile);
+                        if (File.Exists(fullPath))
+                        {
+                            OriginalFileContent = File.ReadAllText(fullPath);
+                        }
+                        else
+                        {
+                            OriginalFileContent = "Файл не найден.";
+                        }
                     }
                     else
                     {
-                        OriginalFileContent = "Файл не найден.";
+                        OriginalFileContent = string.Empty;
                     }
-                }
-                else
-                {
-                    OriginalFileContent = string.Empty;
+
+                    // Считываем перевод файла
+                    LoadTranslationFile(_selectedTranslationFile);
                 }
             }
         }
@@ -414,6 +432,60 @@ namespace RimLocalizer.ViewModels
             }
         }
 
+        private void LoadTranslationFile(string selectedFile)
+        {
+            if (string.IsNullOrEmpty(selectedFile)) return;
+
+            // Путь к папке Languages/Russian
+            string? directoryName = Path.GetDirectoryName(selectedFile);
+            if (directoryName == null)
+            {
+                // Если selectedFile не содержит пути, копируем оригинал
+                TranslatedFileContent = OriginalFileContent;
+                return;
+            }
+
+            string russianPath = Path.Combine(directoryName, "Languages", "Russian");
+            if (!Directory.Exists(russianPath))
+            {
+                // Если папки Russian нет, копируем оригинал
+                TranslatedFileContent = OriginalFileContent;
+                return;
+            }
+
+            // Определяем относительный путь
+            string relativePath;
+            if (selectedFile.StartsWith(ModsPath, StringComparison.OrdinalIgnoreCase))
+            {
+                relativePath = Path.GetRelativePath(ModsPath, selectedFile);
+            }
+            else if (selectedFile.StartsWith(GamePath, StringComparison.OrdinalIgnoreCase))
+            {
+                relativePath = Path.GetRelativePath(Path.Combine(GamePath, "Mods"), selectedFile);
+            }
+            else
+            {
+                // Если путь не соответствует ни ModsPath, ни GamePath
+                TranslatedFileContent = OriginalFileContent;
+                return;
+            }
+
+            // Заменяем папку Defs на DefInjected для соответствия структуре
+            relativePath = relativePath.Replace("Defs", "DefInjected");
+
+            string translationFilePath = Path.Combine(russianPath, relativePath);
+
+            // Если файл перевода существует, загружаем его содержимое
+            if (File.Exists(translationFilePath))
+            {
+                TranslatedFileContent = File.ReadAllText(translationFilePath);
+            }
+            else
+            {
+                // Если перевода нет, копируем оригинал
+                TranslatedFileContent = OriginalFileContent;
+            }
+        }
     }
 }
 

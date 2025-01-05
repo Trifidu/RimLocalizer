@@ -274,7 +274,15 @@
                     </Grid.RowDefinitions>
                     <!--Translated file content-->
                     <TextBlock Grid.Row="0" Text="Переведённый файл:" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,10,10,0"/>
-                    <TextBox Grid.Row="1" Name="TranslatedTextBox" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,0,10,0" TextWrapping="Wrap" AcceptsReturn="True"/>
+                    <TextBox 
+                        Grid.Row="1" 
+                        Name="TranslatedTextBox" 
+                        Text="{Binding TranslatedFileContent, UpdateSourceTrigger=PropertyChanged}"
+                        HorizontalAlignment="Stretch" 
+                        VerticalAlignment="Stretch" 
+                        Margin="10,0,10,0" 
+                        TextWrapping="Wrap" 
+                        AcceptsReturn="True"/>
                     <Button Grid.Row="2" Name="SaveButton" Content="Сохранить" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10" Width="100" Click="SaveButton_Click"/>
                 </Grid>
             </Grid>
