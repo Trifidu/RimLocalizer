@@ -16,6 +16,7 @@ using Microsoft.Win32;
 using RimLocalizer.ViewModels;
 using RimLocalizer.Properties;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using System.Diagnostics;
 
 
 namespace RimLocalizer
@@ -122,6 +123,32 @@ namespace RimLocalizer
                         Properties.Settings.Default.ModsPath = selectedPath;
                         Properties.Settings.Default.Save();
                     }
+                }
+            }
+        }
+
+        // Open mods folder by click on path in desc
+        private void OpenModFolder_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (DataContext is MainViewModel viewModel && !string.IsNullOrEmpty(viewModel.SelectedMod.Path))
+            {
+                string modPath = viewModel.SelectedMod.Path;
+
+                try
+                {
+                    // Check if the folder exists
+                    if (Directory.Exists(modPath))
+                    {
+                        Process.Start("explorer.exe", modPath);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Папка мода не найдена.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка открытия папки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }

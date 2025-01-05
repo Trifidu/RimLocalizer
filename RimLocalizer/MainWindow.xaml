@@ -121,7 +121,7 @@
                     <!-- Name -->
                     <Border Grid.Row="1" Grid.Column="0">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Name: " FontWeight="Bold" />
+                            <TextBlock Text="Имя: " FontWeight="Bold" />
                             <TextBlock Text="{Binding SelectedMod.Name}" TextWrapping="Wrap" />
                         </StackPanel>
                     </Border>
@@ -129,7 +129,7 @@
                     <!-- Author -->
                     <Border Grid.Row="1" Grid.Column="1">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Author: " FontWeight="Bold" />
+                            <TextBlock Text="Автор: " FontWeight="Bold" />
                             <TextBlock Text="{Binding SelectedMod.Author}" TextWrapping="Wrap" />
                         </StackPanel>
                     </Border>
@@ -137,8 +137,15 @@
                     <!-- Path -->
                     <Border Grid.Row="2" Grid.ColumnSpan="2">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Path: " FontWeight="Bold" />
-                            <TextBlock Text="{Binding SelectedMod.Path}" TextWrapping="Wrap" />
+                            <TextBlock Text="Путь: " FontWeight="Bold" />
+                            <TextBlock 
+                                Text="{Binding SelectedMod.Path}" 
+                                MouseLeftButtonDown="OpenModFolder_Click"
+                                Cursor="Hand"
+                                ToolTip="Открыть папку с модом"
+                                Foreground="Blue"
+                                TextDecorations="Underline"
+                                VerticalAlignment="Center" />
                         </StackPanel>
                     </Border>
 
@@ -148,7 +155,7 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Text="Description: " FontWeight="Bold" />
+                        <TextBlock Grid.Row="0" Text="Описание: " FontWeight="Bold" />
                         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                             <TextBlock Text="{Binding SelectedMod.Description}" TextWrapping="Wrap" />
                         </ScrollViewer>

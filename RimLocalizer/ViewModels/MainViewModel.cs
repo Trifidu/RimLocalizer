@@ -11,6 +11,9 @@ using RimLocalizer;
 using System.Xml.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
+using System.Diagnostics;
+using System.Windows;
 
 namespace RimLocalizer.ViewModels
 {
@@ -314,7 +317,7 @@ namespace RimLocalizer.ViewModels
         {
             List<string> files = new List<string>();
 
-            // Проверяем папку Defs
+            // Checking the defs folder
             string defsPath = Path.Combine(basePath, "Defs");
             if (Directory.Exists(defsPath))
             {
@@ -322,7 +325,7 @@ namespace RimLocalizer.ViewModels
                     .Select(file => Path.GetRelativePath(basePath, file)));
             }
 
-            // Проверяем папку Languages/English
+            // Check Languages/English folder
             string languagesPath = Path.Combine(basePath, "Languages", "English");
             if (Directory.Exists(languagesPath))
             {
@@ -370,7 +373,7 @@ namespace RimLocalizer.ViewModels
                     _selectedTranslationFile = value;
                     OnPropertyChanged(nameof(SelectedTranslationFile));
 
-                    // Считываем содержимое оригинального файла
+                    // Read the contents of the original file
                     if (!string.IsNullOrEmpty(_selectedTranslationFile))
                     {
                         string fullPath = Path.Combine(ModsPath, SelectedMod.Path, _selectedTranslationFile);
@@ -388,7 +391,7 @@ namespace RimLocalizer.ViewModels
                         OriginalFileContent = string.Empty;
                     }
 
-                    // Считываем перевод файла
+                    // Read the translation of the file
                     LoadTranslationFile(_selectedTranslationFile);
                 }
             }
@@ -401,10 +404,10 @@ namespace RimLocalizer.ViewModels
             {
                 string basePath = Path.Combine(ModsPath, SelectedMod.Path);
 
-                // Ищем файлы для перевода
+                // Looking for translation files
                 var files = FindTranslationFilesInPaths(basePath).ToList();
 
-                // Если файлов нет, добавляем сообщение
+                // If there are no files, add a message
                 if (files.Count == 0)
                 {
                     files.Add("Нет файлов для перевода.");
@@ -414,7 +417,7 @@ namespace RimLocalizer.ViewModels
             }
             else
             {
-                // Очищаем коллекцию, если мод не выбран
+                // Clearing the collection if no mod is selected
                 TranslationFiles = new ObservableCollection<string>();
             }
 
@@ -436,11 +439,11 @@ namespace RimLocalizer.ViewModels
         {
             if (string.IsNullOrEmpty(selectedFile)) return;
 
-            // Путь к папке Languages/Russian
+            // Path to Languages/Russian folder
             string? directoryName = Path.GetDirectoryName(selectedFile);
             if (directoryName == null)
             {
-                // Если selectedFile не содержит пути, копируем оригинал
+                // If selectedFile does not contain a path, copy the original
                 TranslatedFileContent = OriginalFileContent;
                 return;
             }
@@ -448,12 +451,12 @@ namespace RimLocalizer.ViewModels
             string russianPath = Path.Combine(directoryName, "Languages", "Russian");
             if (!Directory.Exists(russianPath))
             {
-                // Если папки Russian нет, копируем оригинал
+                // If there is no Russian folder, copy the original folder
                 TranslatedFileContent = OriginalFileContent;
                 return;
             }
 
-            // Определяем относительный путь
+            // Determine the relative path
             string relativePath;
             if (selectedFile.StartsWith(ModsPath, StringComparison.OrdinalIgnoreCase))
             {
@@ -465,24 +468,24 @@ namespace RimLocalizer.ViewModels
             }
             else
             {
-                // Если путь не соответствует ни ModsPath, ни GamePath
+                // If the path does not match either ModsPath or GamePath
                 TranslatedFileContent = OriginalFileContent;
                 return;
             }
 
-            // Заменяем папку Defs на DefInjected для соответствия структуре
+            // Replace the Defs folder with DefInjected to match the structure
             relativePath = relativePath.Replace("Defs", "DefInjected");
 
             string translationFilePath = Path.Combine(russianPath, relativePath);
 
-            // Если файл перевода существует, загружаем его содержимое
+            // If the translation file exists, load its contents
             if (File.Exists(translationFilePath))
             {
                 TranslatedFileContent = File.ReadAllText(translationFilePath);
             }
             else
             {
-                // Если перевода нет, копируем оригинал
+                // If there is no translation, copy the original
                 TranslatedFileContent = OriginalFileContent;
             }
         }
