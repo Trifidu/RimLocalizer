@@ -5,18 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RimLocalizer"
         mc:Ignorable="d"
-        Title="RimLocalizer" Height="600" Width="800" MinWidth="800" MinHeight="600">
-    
+        Title="MainWindow" Height="450" Width="800">
     <Grid Margin="10">
-                
+
         <!--Main structure-->
         <Grid.RowDefinitions>
-            <RowDefinition Height="50" />
             <!--Header-->
-            <RowDefinition Height="*" />
+            <RowDefinition Height="50" />
             <!--Main content-->
-            <RowDefinition Height="30" />
+            <RowDefinition Height="*" />
             <!--Footer-->
+            <RowDefinition Height="30" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <!--Sidebar-->
@@ -25,25 +24,17 @@
             <ColumnDefinition Width="75*" />
         </Grid.ColumnDefinitions>
 
-        <!--Title-->
-        <Border Grid.Row="0" Grid.ColumnSpan="2" Padding="10" Background="#EEE"  >
-            <TextBlock 
-                Grid.ColumnSpan="2"
-                Text="RimLocalizer" 
-                HorizontalAlignment="Center" 
-                VerticalAlignment="Top" 
-                FontSize="20" 
-                FontWeight="Bold"
-                />
-        </Border>
-        
         <!--Sidebar-->
         <Border Grid.Row="1" Grid.Column="0" Background="#F5F5F5" Padding="10">
             <Grid VerticalAlignment="Stretch">
                 <Grid.RowDefinitions>
+                    <!--Mods update button-->
                     <RowDefinition Height="10*" />
+                    <!--Serch bar-->
                     <RowDefinition Height="10*" />
+                    <!--Mods list-->
                     <RowDefinition Height="50*" />
+                    <!--Mod description-->
                     <RowDefinition Height="30*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
@@ -60,12 +51,12 @@
                         <ColumnDefinition Width="30*" />
                     </Grid.ColumnDefinitions>
                     <TextBox 
-                        Grid.Column="0"
-                        Width="auto" 
-                        Height="auto" 
-                        MaxHeight="25"
-                        Name="SearchTextBox" 
-                        Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}">
+                     Grid.Column="0"
+                     Width="auto" 
+                     Height="auto" 
+                     MaxHeight="25"
+                     Name="SearchTextBox" 
+                     Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}">
                         <TextBox.Style>
                             <Style TargetType="TextBox">
                                 <Setter Property="Foreground" Value="Gray" />
@@ -82,28 +73,28 @@
                         </TextBox.Style>
                     </TextBox>
                     <Button 
-                        Grid.Column="1"
-                        Content="Очистить" 
-                        Width="auto" 
-                        Height="auto" 
-                        MaxHeight="25"
-                        Command="{Binding ClearSearchCommand}" />
+                     Grid.Column="1"
+                     Content="Очистить" 
+                     Width="auto" 
+                     Height="auto" 
+                     MaxHeight="25"
+                     Command="{Binding ClearSearchCommand}" />
                 </Grid>
                 <!--Modlist-->
                 <ListBox 
-                    Grid.Row="2" 
-                    Grid.ColumnSpan="2" 
-                    Name="ModsListBox" 
-                    VerticalAlignment="Stretch" 
-                    HorizontalAlignment="Stretch" 
-                    ItemsSource="{Binding FilteredMods}" 
-                    SelectedItem="{Binding SelectedMod, Mode=TwoWay}">
+                 Grid.Row="2" 
+                 Grid.ColumnSpan="2" 
+                 Name="ModsListBox" 
+                 VerticalAlignment="Stretch" 
+                 HorizontalAlignment="Stretch" 
+                 ItemsSource="{Binding FilteredMods}" 
+                 SelectedItem="{Binding SelectedMod, Mode=TwoWay}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock>
-                                <Run Text="{Binding Source}" />
-                                <Run Text=" " />
-                                <Run Text="{Binding Name}" />
+                             <Run Text="{Binding Source}" />
+                             <Run Text=" " />
+                             <Run Text="{Binding Name}" />
                             </TextBlock>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -159,13 +150,13 @@
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" Text="Description: " FontWeight="Bold" />
                         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                             <TextBlock Text="{Binding SelectedMod.Description}" TextWrapping="Wrap" />
-                        </ScrollViewer>                            
+                            <TextBlock Text="{Binding SelectedMod.Description}" TextWrapping="Wrap" />
+                        </ScrollViewer>
                     </Grid>
                 </Grid>
             </Grid>
         </Border>
-        
+
         <!--Main content-->
         <Grid Grid.Column="1" Grid.Row="1" Margin="10">
             <!--Main content structure-->
@@ -176,9 +167,10 @@
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="25*" />
-                <RowDefinition Height="75*" />
+                <RowDefinition Height="25*" />
+                <RowDefinition Height="50*" />
             </Grid.RowDefinitions>
-            
+
             <!--Game and Mods pathes-->
             <StackPanel Grid.ColumnSpan="2" Grid.Row="0" Margin="5">
                 <Grid VerticalAlignment="Stretch" >
@@ -215,8 +207,31 @@
                 </Grid>
             </StackPanel>
 
+            <!--File list-->
+            <Grid Grid.Row="1" Grid.ColumnSpan="2" Margin="5,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="15*" />
+                    <RowDefinition Height="85*" />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0"  Text="Файлы для перевода:" Margin="5,0,0,5" />
+                <ListBox 
+                 Grid.Row="1" 
+                 Name="FilesListBox" 
+                 HorizontalAlignment="Stretch" 
+                 VerticalAlignment="Stretch"
+                 ItemsSource="{Binding TranslationFiles}"
+                 SelectedItem="{Binding SelectedTranslationFile, Mode=TwoWay}"
+                 >
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+
             <!--Original and translated files-->
-            <Grid Grid.Column="0" Grid.Row="1">
+            <Grid Grid.Column="0" Grid.Row="2">
                 <Grid VerticalAlignment="Stretch">
                     <!--Original file scructure-->
                     <Grid.RowDefinitions>
@@ -226,11 +241,30 @@
                     </Grid.RowDefinitions>
                     <!--Original file content-->
                     <TextBlock Grid.Row="0" Text="Оригинальный файл:" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,10,0,0"/>
-                    <TextBox Grid.Row="1" Name="OriginalTextBox" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,0,0,0" TextWrapping="Wrap" AcceptsReturn="True"/>
-                    <Button Grid.Row="2" Name="LoadButton" Content="Загрузить" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,10" Width="100" Click="LoadButton_Click"/>
+                    <TextBox 
+                     Grid.Row="1" 
+                     Name="OriginalTextBox" 
+                     HorizontalAlignment="Stretch" 
+                     VerticalAlignment="Stretch" 
+                     Margin="10,0,0,0" 
+                     TextWrapping="Wrap" 
+                     AcceptsReturn="True"
+                     Text="{Binding OriginalFileContent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     IsReadOnly="True"
+                     />
+                    <Button 
+                     Grid.Row="2" 
+                     Name="LoadButton" 
+                     Content="Загрузить" 
+                     HorizontalAlignment="Left" 
+                     VerticalAlignment="Bottom" 
+                     Margin="10,0,0,10" Width="100" 
+                     Click="LoadButton_Click"
+                     Visibility="Collapsed"
+                     />
                 </Grid>
             </Grid>
-            <Grid Grid.Column="1" Grid.Row="1">
+            <Grid Grid.Column="1" Grid.Row="2">
                 <Grid VerticalAlignment="Stretch">
                     <!--Translated file scructure-->
                     <Grid.RowDefinitions>
@@ -245,7 +279,7 @@
                 </Grid>
             </Grid>
         </Grid>
-        
+
         <!--Footer-->
         <Border Grid.Row="2" Grid.ColumnSpan="2" Background="#EEE" Padding="5">
             <TextBlock Text="Статус: Готово" HorizontalAlignment="Right" VerticalAlignment="Center" />

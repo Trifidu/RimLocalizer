@@ -15,6 +15,8 @@ using System.IO;
 using Microsoft.Win32;
 using RimLocalizer.ViewModels;
 using RimLocalizer.Properties;
+using Microsoft.WindowsAPICodePack.Dialogs;
+
 
 namespace RimLocalizer
 {
@@ -34,7 +36,7 @@ namespace RimLocalizer
         // Open file XML and copy to original Dialog Window
         private void LoadButton_Click(object sender, RoutedEventArgs e)
         {
-            
+
             OpenFileDialog openFileDialogForLoad = new OpenFileDialog();
             openFileDialogForLoad.Filter = "XML файлы (*.xml)|*.xml|Все файлы (*.*)|*.*";
             if (openFileDialogForLoad.ShowDialog() == true)
@@ -50,11 +52,11 @@ namespace RimLocalizer
         // Save new file XML to specific path
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            
+
             // Check that TextBox is not empty
             if (string.IsNullOrEmpty(TranslatedTextBox.Text))
             {
-                MessageBox.Show ("Переведенный текст пустой. Нечего сохранять!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Переведенный текст пустой. Нечего сохранять!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -79,62 +81,49 @@ namespace RimLocalizer
         // Chosing game path
         private void SelectGamePathButton_Click(object sender, RoutedEventArgs e)
         {
-            using (var folderDialog = new System.Windows.Forms.FolderBrowserDialog())
+            using (var folderDialog = new CommonOpenFileDialog
             {
-                folderDialog.Description = "Выберите папку с игрой RimWorld";
-                if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                IsFolderPicker = true,
+                Title = "Выберите папку с игрой RimWorld",
+                InitialDirectory = Properties.Settings.Default.GamePath ?? "C:\\"
+            })
+            {
+                if (folderDialog.ShowDialog() == CommonFileDialogResult.Ok)
                 {
+                    var selectedPath = folderDialog.FileName;
+
                     if (DataContext is MainViewModel viewModel)
                     {
-                        viewModel.GamePath = folderDialog.SelectedPath;
-                        Properties.Settings.Default.GamePath = folderDialog.SelectedPath;
+                        viewModel.GamePath = selectedPath;
+                        Properties.Settings.Default.GamePath = selectedPath;
                         Properties.Settings.Default.Save();
                     }
                 }
             }
-
-            //
-            // var openFileDialog = new OpenFileDialog
-            // {
-            //    Title = "Выберите файл из корневой папки с игрой", 
-            //    Filter = "Все файлы (*.*)|*.*"
-            // };
-
-            // if (openFileDialog.ShowDialog() == true)
-            // {
-            //    string folderPath = Path.GetDirectoryName(openFileDialog.FileName);
-            //    GamePathTextBox.Text = folderPath;
-            // }
         }
 
         // Chosing mods path
         private void SelectModsPathButton_Click(object sender, RoutedEventArgs e)
         {
-            using (var folderDialog = new System.Windows.Forms.FolderBrowserDialog())
+            using (var folderDialog = new CommonOpenFileDialog
             {
-                folderDialog.Description = "Выберите папку с модами";
-                if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                IsFolderPicker = true,
+                Title = "Выберите папку с модами",
+                InitialDirectory = Properties.Settings.Default.ModsPath ?? "C:\\"
+            })
+            {
+                if (folderDialog.ShowDialog() == CommonFileDialogResult.Ok)
                 {
+                    var selectedPath = folderDialog.FileName;
+
                     if (DataContext is MainViewModel viewModel)
                     {
-                        viewModel.ModsPath = folderDialog.SelectedPath;
-                        Properties.Settings.Default.ModsPath = folderDialog.SelectedPath;
-                        Properties.Settings.Default.Save(); // Сохраняем настройки
+                        viewModel.ModsPath = selectedPath;
+                        Properties.Settings.Default.ModsPath = selectedPath;
+                        Properties.Settings.Default.Save();
                     }
                 }
             }
-            // var openFileDialog = new OpenFileDialog
-            // {
-            //     Title = "Выберите файл из папки с модами RimWorld",
-            //     Filter = "Все файлы (*.*)|*.*"
-            // };
-            // 
-            // if (openFileDialog.ShowDialog() == true)
-            // {
-            //     // Получаем путь к папке, в которой находится файл
-            //     string folderPath = Path.GetDirectoryName(openFileDialog.FileName);
-            //     ModsPathTextBox.Text = folderPath;
-            // }
         }
     }
 }

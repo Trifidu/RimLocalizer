@@ -10,22 +10,30 @@ using System.Windows.Input;
 using RimLocalizer;
 using System.Xml.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
+
 namespace RimLocalizer.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
         // Event for notification of changes to properties 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-        private ModItem _selectedMod; // Поле для хранения выбранного мода
+        // Field for storing the selected mod
+        private ModItem _selectedMod;
 
         public ModItem SelectedMod
         {
             get => _selectedMod;
             set
             {
-                _selectedMod = value; // Устанавливаем выбранный мод
-                OnPropertyChanged(nameof(SelectedMod)); // Уведомляем интерфейс об изменении
+                // Install the selected mod
+                _selectedMod = value;
+                // Notify the interface of the change
+                OnPropertyChanged(nameof(SelectedMod));
+
+                // Updating the file list
+                UpdateTranslationFiles();
             }
         }
 
@@ -68,6 +76,17 @@ namespace RimLocalizer.ViewModels
         // ViewModel
         public MainViewModel()
         {
+            // Initializing fields
+            _selectedMod = new ModItem();
+            _mods = new ObservableCollection<ModItem>();
+            _gamePath = string.Empty;
+            _modsPath = string.Empty;
+            _searchQuery = string.Empty;
+            _filteredMods = new ObservableCollection<ModItem>();
+            _originalFileContent = string.Empty;
+            _selectedTranslationFile = string.Empty;
+            _originalFilePath = string.Empty;
+
             // Initialising the mod collection
             GamePath = Properties.Settings.Default.GamePath;
             ModsPath = Properties.Settings.Default.ModsPath;
@@ -156,10 +175,10 @@ namespace RimLocalizer.ViewModels
 
         public class ModInfo
         {
-            public string Name { get; set; }
-            public string Description { get; set; }
-            public string Author { get; set; }
-            public string PreviewPath { get; set; }
+            public string Name { get; set; } = string.Empty;
+            public string Description { get; set; } = string.Empty;
+            public string Author { get; set; } = string.Empty;
+            public string PreviewPath { get; set; } = string.Empty;
         }
 
         //Method to add desc from mods
@@ -174,22 +193,23 @@ namespace RimLocalizer.ViewModels
                 {
                     Name = "Неизвестный мод, проблема чтения About.xml",
                     Description = "Описание отсутствует",
-                    Author = null,
-                    PreviewPath = null,
+                    Author = string.Empty,
+                    PreviewPath = string.Empty,
                 };
             }
+
             var xml = XDocument.Load(aboutPath);
 
-            string name = xml.Root.Element("name")?.Value ?? "Неизвестный мод";
-            string description = xml.Root.Element("description")?.Value ?? "Описание отсутствует";
-            string author = xml.Root.Element("author")?.Value ?? "Автор отсутствует";
+            string name = xml.Root?.Element("name")?.Value ?? "Неизвестный мод";
+            string description = xml.Root?.Element("description")?.Value ?? "Описание отсутствует";
+            string author = xml.Root?.Element("author")?.Value ?? "Автор отсутствует";
 
             return new ModInfo
             {
                 Name = name,
                 Description = description,
                 Author = author,
-                PreviewPath = File.Exists(previewPath) ? previewPath : null
+                PreviewPath = File.Exists(previewPath) ? previewPath : string.Empty
             };
         }
 
@@ -238,6 +258,161 @@ namespace RimLocalizer.ViewModels
         // Command to clear the search field
         public ICommand ClearSearchCommand { get; }
 
+        // Search file to translate
+        private List<string> GetTranslationFiles(string modPath)
+        {
+            List<string> translationFiles = new List<string>();
+
+            // Find the latest version
+            // Only folders with numbers and Sort by descending order
+            var versionFolders = Directory.GetDirectories(modPath)
+                .Where(dir => Regex.IsMatch(Path.GetFileName(dir), @"^\d+(\.\d+)*$"))
+                .OrderByDescending(dir => dir, StringComparer.Ordinal);
+
+            string? latestVersionPath = versionFolders.FirstOrDefault();
+            if (!string.IsNullOrEmpty(latestVersionPath))
+            {
+                // Check Languages/English and Defs folders inside the latest version
+                translationFiles.AddRange(FindTranslationFilesInPaths(latestVersionPath));
+            }
+
+            // If there is nothing inside the latest version, check the root folder
+            if (translationFiles.Count == 0)
+            {
+                translationFiles.AddRange(FindTranslationFilesInPaths(modPath));
+            }
+
+            // If nothing is found
+            if (translationFiles.Count == 0)
+            {
+                translationFiles.Add("Нет файлов для перевода.");
+            }
+
+            return translationFiles;
+        }
+
+        private string GetRelativePath(string basePath, string fullPath)
+        {
+            Uri baseUri = new Uri(basePath.EndsWith("\\") ? basePath : basePath + "\\");
+            Uri fullUri = new Uri(fullPath);
+            return Uri.UnescapeDataString(baseUri.MakeRelativeUri(fullUri).ToString().Replace('/', Path.DirectorySeparatorChar));
+        }
+
+        private IEnumerable<string> FindTranslationFilesInPaths(string basePath)
+        {
+            List<string> files = new List<string>();
+
+            // Проверяем папку Defs
+            string defsPath = Path.Combine(basePath, "Defs");
+            if (Directory.Exists(defsPath))
+            {
+                files.AddRange(Directory.GetFiles(defsPath, "*.xml", SearchOption.AllDirectories)
+                    .Select(file => Path.GetRelativePath(basePath, file)));
+            }
+
+            // Проверяем папку Languages/English
+            string languagesPath = Path.Combine(basePath, "Languages", "English");
+            if (Directory.Exists(languagesPath))
+            {
+                files.AddRange(Directory.GetFiles(languagesPath, "*.xml", SearchOption.AllDirectories)
+                    .Select(file => Path.GetRelativePath(basePath, file)));
+            }
+
+            return files;
+        }
+
+        // Collection of files for translation
+        private ObservableCollection<string> _translationFiles = new ObservableCollection<string>();
+        public ObservableCollection<string> TranslationFiles
+        {
+            get => _translationFiles;
+            set
+            {
+                _translationFiles = value;
+                OnPropertyChanged(nameof(TranslationFiles));
+            }
+        }
+
+        // Open file to translate from filelist
+        // property for storing file contents
+        private string _originalFileContent;
+        public string OriginalFileContent
+        {
+            get => _originalFileContent;
+            set
+            {
+                _originalFileContent = value;
+                OnPropertyChanged(nameof(OriginalFileContent));
+            }
+        }
+
+        // select a file, read its contents and write it
+        private string _selectedTranslationFile;
+        public string SelectedTranslationFile
+        {
+            get => _selectedTranslationFile;
+            set
+            {
+                _selectedTranslationFile = value;
+                OnPropertyChanged(nameof(SelectedTranslationFile));
+
+                // Считываем содержимое файла
+                if (!string.IsNullOrEmpty(_selectedTranslationFile))
+                {
+                    string fullPath = Path.Combine(ModsPath, SelectedMod.Path, _selectedTranslationFile);
+                    if (File.Exists(fullPath))
+                    {
+                        OriginalFileContent = File.ReadAllText(fullPath);
+                    }
+                    else
+                    {
+                        OriginalFileContent = "Файл не найден.";
+                    }
+                }
+                else
+                {
+                    OriginalFileContent = string.Empty;
+                }
+            }
+        }
+
+        // method to update file list for translate
+        private void UpdateTranslationFiles()
+        {
+            if (SelectedMod != null)
+            {
+                string basePath = Path.Combine(ModsPath, SelectedMod.Path);
+
+                // Ищем файлы для перевода
+                var files = FindTranslationFilesInPaths(basePath).ToList();
+
+                // Если файлов нет, добавляем сообщение
+                if (files.Count == 0)
+                {
+                    files.Add("Нет файлов для перевода.");
+                }
+
+                TranslationFiles = new ObservableCollection<string>(files);
+            }
+            else
+            {
+                // Очищаем коллекцию, если мод не выбран
+                TranslationFiles = new ObservableCollection<string>();
+            }
+
+            OnPropertyChanged(nameof(TranslationFiles));
+        }
+
+        private string _originalFilePath;
+        public string OriginalFilePath
+        {
+            get => _originalFilePath;
+            set
+            {
+                _originalFilePath = value;
+                OnPropertyChanged(nameof(OriginalFilePath));
+            }
+        }
 
     }
 }
@@ -249,21 +424,21 @@ namespace RimLocalizer
         private readonly Action _execute;
         private readonly Func<bool> _canExecute;
 
-        public event EventHandler CanExecuteChanged;
+        public event EventHandler? CanExecuteChanged;
 
         // RelayCommand constructor
-        public RelayCommand(Action execute, Func<bool> canExecute = null)
+        public RelayCommand(Action execute, Func<bool>? canExecute = null)
         {
             _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-            _canExecute = canExecute;
+            _canExecute = canExecute ?? (() => true);
         }
 
-        public bool CanExecute(object parameter)
+        public bool CanExecute(object? parameter)
         {
             return _canExecute == null || _canExecute();
         }
 
-        public void Execute(object parameter)
+        public void Execute(object? parameter)
         {
             _execute();
         }
