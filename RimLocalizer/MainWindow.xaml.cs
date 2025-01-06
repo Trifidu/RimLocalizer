@@ -152,5 +152,50 @@ namespace RimLocalizer
                 }
             }
         }
+
+        // sync scroll for original and translated textboxed
+        private ScrollViewer? GetScrollViewer(DependencyObject dependencyObject)
+        {
+            if (dependencyObject is ScrollViewer)
+            {
+                return (ScrollViewer)dependencyObject;
+            }
+
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(dependencyObject); i++)
+            {
+                var child = VisualTreeHelper.GetChild(dependencyObject, i);
+                var result = GetScrollViewer(child);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+
+            return null;
+        }
+
+        private void SynchronizeScrolling()
+        {
+            var originalScrollViewer = GetScrollViewer(OriginalTextBox);
+            var translatedScrollViewer = GetScrollViewer(TranslatedTextBox);
+
+            if (originalScrollViewer != null && translatedScrollViewer != null)
+            {
+                originalScrollViewer.ScrollChanged += (s, e) =>
+                {
+                    translatedScrollViewer.ScrollToVerticalOffset(originalScrollViewer.VerticalOffset);
+                };
+
+                translatedScrollViewer.ScrollChanged += (s, e) =>
+                {
+                    originalScrollViewer.ScrollToVerticalOffset(translatedScrollViewer.VerticalOffset);
+                };
+            }
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            SynchronizeScrolling();
+        }
     }
 }

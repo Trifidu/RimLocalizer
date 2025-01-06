@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RimLocalizer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="640" Width="1024"
+        Loaded="Window_Loaded">
     <Grid Margin="10">
 
         <!--Main structure-->
@@ -51,27 +52,13 @@
                         <ColumnDefinition Width="30*" />
                     </Grid.ColumnDefinitions>
                     <TextBox 
-                     Grid.Column="0"
-                     Width="auto" 
-                     Height="auto" 
-                     MaxHeight="25"
-                     Name="SearchTextBox" 
-                     Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}">
-                        <TextBox.Style>
-                            <Style TargetType="TextBox">
-                                <Setter Property="Foreground" Value="Gray" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Text, RelativeSource={RelativeSource Self}}" Value="">
-                                        <Setter Property="Text" Value="Поиск модов..." />
-                                        <Setter Property="Foreground" Value="LightGray" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Text, RelativeSource={RelativeSource Self}}" Value="{x:Null}">
-                                        <Setter Property="Foreground" Value="Black" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBox.Style>
-                    </TextBox>
+                    Grid.Column="0"
+                    Width="auto" 
+                    Height="auto" 
+                    MaxHeight="25"
+                    Name="SearchTextBox" 
+                    Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
+                    />
                     <Button 
                      Grid.Column="1"
                      Content="Очистить" 
@@ -251,6 +238,7 @@
                     <TextBox 
                      Grid.Row="1" 
                      Name="OriginalTextBox" 
+                     VerticalScrollBarVisibility="Auto"
                      HorizontalAlignment="Stretch" 
                      VerticalAlignment="Stretch" 
                      Margin="10,0,0,0" 
@@ -284,6 +272,7 @@
                     <TextBox 
                         Grid.Row="1" 
                         Name="TranslatedTextBox" 
+                        VerticalScrollBarVisibility="Auto"
                         Text="{Binding TranslatedFileContent, UpdateSourceTrigger=PropertyChanged}"
                         HorizontalAlignment="Stretch" 
                         VerticalAlignment="Stretch" 
