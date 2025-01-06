@@ -393,6 +393,7 @@ namespace RimLocalizer.ViewModels
 
                     // Read the translation of the file
                     LoadTranslationFile(_selectedTranslationFile);
+                    CheckForDiscrepancies();
                 }
             }
         }
@@ -487,6 +488,144 @@ namespace RimLocalizer.ViewModels
             {
                 // If there is no translation, copy the original
                 TranslatedFileContent = OriginalFileContent;
+            }
+        }
+
+        // method will compare Keyed XML and return a list of mismatches.
+        private List<string> CompareKeyedXml(XDocument original, XDocument translation)
+        {
+            var discrepancies = new List<string>();
+
+            // Получаем все узлы из оригинала
+            var originalKeys = original.Descendants("LanguageData").Elements().ToDictionary(e => e.Name.LocalName, e => e.Value);
+
+            // Получаем все узлы из перевода
+            var translatedKeys = translation.Descendants("LanguageData").Elements().ToDictionary(e => e.Name.LocalName, e => e.Value);
+
+            // Проверяем отсутствие ключей в переводе
+            foreach (var key in originalKeys.Keys)
+            {
+                if (!translatedKeys.ContainsKey(key))
+                {
+                    discrepancies.Add($"Key missing in translation: {key}");
+                }
+            }
+
+            // Проверяем лишние ключи в переводе
+            foreach (var key in translatedKeys.Keys)
+            {
+                if (!originalKeys.ContainsKey(key))
+                {
+                    discrepancies.Add($"Extra key in translation: {key}");
+                }
+            }
+
+            return discrepancies;
+        }
+
+        // method will compare Def XML and return a list of mismatches.
+        private List<string> CompareDefsXml(XDocument original, XDocument translation)
+        {
+            var discrepancies = new List<string>();
+
+            // Получаем все узлы ThingDef из оригинала
+            var originalDefs = original.Descendants("ThingDef").ToList();
+
+            // Получаем все узлы ThingDef из перевода
+            var translatedDefs = translation.Descendants("ThingDef").ToList();
+
+            // Сравнение оригинальных и переведенных узлов
+            foreach (var originalDef in originalDefs)
+            {
+                // Ищем соответствующий узел в переводе по defName
+                var defName = originalDef.Element("defName")?.Value;
+                var matchingDef = translatedDefs.FirstOrDefault(d => d.Element("defName")?.Value == defName);
+
+                if (matchingDef == null)
+                {
+                    discrepancies.Add($"Missing translation for ThingDef: {defName}");
+                    continue;
+                }
+
+                // Сравнение содержимого узлов
+                foreach (var element in originalDef.Elements())
+                {
+                    var translatedElement = matchingDef.Element(element.Name);
+                    if (translatedElement == null)
+                    {
+                        discrepancies.Add($"Missing element in translation: {defName}/{element.Name}");
+                    }
+                    else if (element.Value != translatedElement.Value)
+                    {
+                        discrepancies.Add($"Mismatch in element value: {defName}/{element.Name} - Original: {element.Value}, Translation: {translatedElement.Value}");
+                    }
+                }
+            }
+
+            // Проверка на лишние элементы в переводе
+            foreach (var translatedDef in translatedDefs)
+            {
+                var defName = translatedDef.Element("defName")?.Value;
+                if (!originalDefs.Any(d => d.Element("defName")?.Value == defName))
+                {
+                    discrepancies.Add($"Extra ThingDef in translation: {defName}");
+                }
+            }
+
+            return discrepancies;
+        }
+
+        private string _statusMessage;
+        public string StatusMessage
+        {
+            get => _statusMessage;
+            set
+            {
+                _statusMessage = value;
+                OnPropertyChanged(nameof(StatusMessage));
+            }
+        }
+
+        // Method call comparison between the original and the translation and display the result of the check.
+        private void CheckForDiscrepancies()
+        {
+            if (string.IsNullOrEmpty(OriginalFileContent) || string.IsNullOrEmpty(TranslatedFileContent))
+            {
+                StatusMessage = "Файлы не загружены или пустые!";
+                return;
+            }
+
+            try
+            {
+                // Загружаем файлы в XDocument
+                var originalDoc = XDocument.Parse(OriginalFileContent);
+                var translatedDoc = XDocument.Parse(TranslatedFileContent);
+
+                // Определяем тип файла
+                var discrepancies = new List<string>();
+                if (originalDoc.Root?.Name == "LanguageData")
+                {
+                    discrepancies = CompareKeyedXml(originalDoc, translatedDoc);
+                }
+                else if (originalDoc.Root?.Name == "Defs")
+                {
+                    discrepancies = CompareDefsXml(originalDoc, translatedDoc);
+                }
+
+                // Отображаем статус
+                if (discrepancies.Count > 0)
+                {
+                    StatusMessage = $"Найдены несоответствия ({discrepancies.Count}). Проверьте результаты!";
+                    // В будущем можно сохранить результаты в отдельное свойство для отображения в интерфейсе
+                }
+                else
+                {
+                    StatusMessage = "Перевод полностью соответствует оригиналу!";
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Ошибка проверки: {ex.Message}";
             }
         }
     }

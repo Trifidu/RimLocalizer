@@ -286,7 +286,7 @@
 
         <!--Footer-->
         <Border Grid.Row="2" Grid.ColumnSpan="2" Background="#EEE" Padding="5">
-            <TextBlock Text="Статус: Готово" HorizontalAlignment="Right" VerticalAlignment="Center" />
+            <TextBlock Text="{Binding StatusMessage}" HorizontalAlignment="Right" VerticalAlignment="Center" />
         </Border>
     </Grid>
 </Window>
